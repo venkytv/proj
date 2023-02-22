@@ -67,6 +67,9 @@ func loadProj(name string) {
 	// Inject secrets from 1Password
 	env := opInject(dir)
 
+	// Add projname env var
+	env = append(env, fmt.Sprintf("PROJNAME=%s", name))
+
 	err := syscall.Exec(shell, []string{shell}, env)
 	panic(fmt.Sprintf("%s: %s", shell, err))
 }

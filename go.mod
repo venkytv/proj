@@ -1,3 +1,3 @@
-module com.duh-uh.proj
+module github.com/venkytv/proj
 
 go 1.19
