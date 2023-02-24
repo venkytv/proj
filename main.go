@@ -74,8 +74,20 @@ func loadProj(name string) {
 	panic(fmt.Sprintf("%s: %s", shell, err))
 }
 
+func getProjNameFromTmux() string {
+	cmd := exec.Command(Tmux, "display-message", "-p", "#S")
+	var out strings.Builder
+	cmd.Stdout = &out
+	if err := cmd.Run(); err != nil {
+		// Unable to retrieve project name from tmux
+		return ""
+	}
+	return strings.TrimSuffix(out.String(), "\n")
+}
+
 func main() {
 	var buildFlag bool
+	var proj string
 
 	flag.BoolVar(&buildFlag, "b", false, "build proj area")
 
@@ -84,12 +96,18 @@ func main() {
 	}
 
 	flag.Parse()
-	if flag.NArg() != 1 {
+
+	switch flag.NArg() {
+	case 0:
+		proj = getProjNameFromTmux()
+	case 1:
+		proj = flag.Args()[0]
+	}
+
+	if len(proj) < 1 {
 		flag.Usage()
 		os.Exit(1)
 	}
-
-	proj := flag.Args()[0]
 
 	if buildFlag {
 		buildProj(proj)
